@@ -1,0 +1,131 @@
+# This is Ivans and MA's algo please don't forget to site it.
+# These are footbots has to be changed to khepera
+R = 0.085
+R_w = 0.029 # wheel radi
+L = 0.14
+
+default_velocity = 10.0
+default_fwd_angle = 30.0
+safety_radius = 0.1
+robot_radius = R
+
+
+function avoid_collision(v_l, v_r){
+  # MA's collision detection
+  var d_i = 100
+  var alpha_rad_i = 0.0
+
+  var i = 0
+  while(i < size(proximity)){
+    if(proximity[i].value < d_i and proximity[i].value > 0.0){
+      d_i = proximity[i].value
+      alpha_rad_i = proximity[i].angle
+    }
+    i = i + 1
+  }
+
+  k_v = 10 # no noise: 40
+  k_w = 35 # no noise: 850
+  penalty = math.exp(d_i - safety_radius)
+
+  #safety_radius = 0.05
+  if( math.cos(math.vec2.angle(res)) < 0.0){
+    penalty = math.exp(-(d_i - safety_radius))
+  }
+
+  W = penalty
+  V = default_velocity
+
+  V = default_velocity - math.cos(math.vec2.angle(res)) * penalty * k_v
+
+  if(alpha_rad_i > 0.0){
+    W = -penalty
+  } else {
+    W = penalty
+  }
+
+  W = -k_w * penalty * math.sin( math.vec2.angle(res) )
+
+  # blended with control
+  v_left = ((V - robot_radius * W) + v_l ) / 2.0
+  v_right = ((V + robot_radius * W) + v_r ) / 2.0
+
+  # non-blended
+  #v_left = V - robot_radius * W
+  #v_right = V + robot_radius * W
+
+  set_wheels(v_left, v_right)
+}
+
+
+# 10° = 174533 Rad
+function within_min_and_max_bound_included(value){
+  return value >= -0.174533 and value <= 0.174533
+}
+
+function collision_safe_drive(v, omega){
+
+  v = v * 2.0
+  v_l = (v - (omega * L )) / (2.0 * R)
+  v_r = (v + (omega * L )) / (2.0 * R)
+
+  if(detect_collision() == 0) {
+    set_wheels(v_l, v_r)
+  } else {
+    avoid_collision(v_l, v_r)
+    #set_wheels(0.0, 0.0)
+  }
+}
+
+function detect_collision(){
+  res = math.vec2.scale(
+    reduce(proximity,
+      function(key, value, acc){
+        tmp = math.vec2.newp(value.value, value.angle)
+        acc = math.vec2.add(acc, tmp)
+        return acc
+      }, math.vec2.new(0, 0)), 1.0 / size(proximity) )
+
+  #if(math.vec2.length(res) < 0.01){
+  # return 0
+  #} else {
+  # return 1
+  #}
+  if(within_min_and_max_bound_included(math.vec2.angle(res)) and math.vec2.length(res) < 0.0005) {
+    return 0
+  } else {
+    return 1
+  }
+}
+
+function abstract_safe_drive(move_vec){
+  # calculate taget distance and orientation for collision free movement
+  var distance_to_target = math.vec2.length(move_vec)
+  var d_a = math.vec2.angle(move_vec)
+
+  if(d_a < -math.pi){
+    d_a = 2 * math.pi + math.vec2.angle(move_vec)
+  }
+  if(distance_to_target > 0.1)
+    collision_safe_drive(default_velocity / 10.0, d_a)
+  else
+    set_wheels(0.0,0.0)
+}
+
+function collision_free_moveto(move_vec){
+  var i = 0
+  var idx = 0
+  var value = -1
+  while(i < size(proximity)) {
+    if(value < proximity[i].value){
+      idx = i
+      value = proximity[i].value
+    }
+    i = i + 1
+  }
+  if(value ==0) goto(move_vec.x, move_vec.y)
+  else{
+    abstract_safe_drive(move_vec)
+  }
+}
+

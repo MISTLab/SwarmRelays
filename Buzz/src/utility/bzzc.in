@@ -1,0 +1,137 @@
+#!/usr/bin/env bash
+
+# Version information
+BUZZ_VERSION="@CPACK_PACKAGE_VERSION@"
+BUZZ_RELEASE="@CPACK_PACKAGE_RELEASE@"
+
+# Stop on any error
+set -e
+
+#
+# Help function
+#
+function help() {
+    echo -e "Usage:\n\t$0 [-I path1:path2:...:pathN] [-b bytecode.bo] [-d debug.bdb] [-a asm.basm] infile.bzz\n"
+    echo "Type 'man bzzc' for more information."
+}
+
+#
+# Version function
+#
+function version() {
+    echo "$0 version ${BUZZ_VERSION}-${BUZZ_RELEASE}"
+}
+
+#
+# Check tools
+#
+if [[ -z $BZZPARSE ]]; then
+    command -v bzzparse >/dev/null 2>&1 || { echo >&2 "$0: error: can't find bzzparse"; exit 1; }
+    BZZPARSE=bzzparse
+fi
+if [[ -z $BZZASM ]]; then
+    command -v bzzasm >/dev/null 2>&1 || { echo >&2 "$0: error: can't find bzzasm"; exit 1; }
+    BZZASM=bzzasm
+fi
+command -v rev >/dev/null 2>&1 || { echo >&2 "$0: error: can't find rev"; exit 1; }
+command -v cut >/dev/null 2>&1 || { echo >&2 "$0: error: can't find cut"; exit 1; }
+
+#
+# Check command line
+#
+BZZ=""
+while (($#))
+do
+    case $1 in
+        -I|--include)
+            if [[ -n $2 ]]; then
+                export BUZZ_INCLUDE_PATH=$BUZZ_INCLUDE_PATH:$2
+            else
+                echo "$0: error: $1 expects a colon-separated list of paths"
+                echo "Type 'bzzc -h' or 'man bzzc' for more information."
+                exit 1
+            fi
+            shift 2
+        ;;
+        -b|--bytecode)
+            if [[ -n $2 ]]; then
+                BO=$2
+            else
+                echo "$0: error: $1 expects a file name"
+                echo "Type 'bzzc -h' or 'man bzzc' for more information."
+                exit 1
+            fi
+            shift 2
+        ;;
+        -d|--debug)
+            if [[ -n $2 ]]; then
+                BDB=$2
+            else
+                echo "$0: error: $1 expects a file name"
+                echo "Type 'bzzc -h' or 'man bzzc' for more information."
+                exit 1
+            fi
+            shift 2
+        ;;
+        -a|--asm)
+            if [[ -n $2 ]]; then
+                BASM=$2
+            else
+                echo "$0: error: $1 expects a file name"
+                echo "Type 'bzzc -h' or 'man bzzc' for more information."
+                exit 1
+            fi
+            shift 2
+        ;;
+        -h|--help)
+            help
+            shift
+            exit 0
+        ;;
+        -v|--version)
+            version
+            shift
+            exit 0
+        ;;
+        *)
+            if [[ -z $BZZ ]]; then
+                BZZ=$1
+            else
+                echo "$0: error: unrecognized option $1"
+                echo "Type 'bzzc -h' or 'man bzzc' for more information."
+                exit 1
+            fi
+            shift
+        ;;
+    esac
+done
+if [[ -z $BZZ ]]; then
+    echo "$0: error: missing script file"
+    echo "Type 'bzzc -h' or 'man bzzc' for more information."
+    exit 1    
+fi
+
+#
+# Set file names
+#
+KEEPBASM=y
+if [[ -z $BASM ]]; then
+    KEEPBASM=n
+    BASM=$(mktemp bzz.XXXXXX)
+fi
+if [[ -z $BO ]]; then
+    BO="$(echo $BZZ | rev | cut -d. -f 2- | rev).bo"
+fi
+if [[ -z $BDB ]]; then
+    BDB="$(echo $BZZ | rev | cut -d. -f 2- | rev).bdb"
+fi
+
+#
+# Compilation
+#
+$BZZPARSE "$BZZ" "$BASM" && $BZZASM "$BASM" "$BO" "$BDB"
+RETVAL=$?
+if [[ "${KEEPBASM}" = "n" ]]; then
+    rm -f "$BASM"
+fi
+exit $RETVAL

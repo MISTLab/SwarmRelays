@@ -1,0 +1,24 @@
+print("this", " ", "is", " ", "a", " ", "test")
+
+f = io.fopen("../../src/testing/testhexagon.bzz", "r")
+
+if(not f) {
+  print(io.error_message, "(", io.errno, ")")
+}
+else {
+  print(io.error_message, "(", io.errno, ")")
+  io.fforeach(f, function(line) {
+      print(f.name, ": ", line)
+    })
+}
+io.fclose(f)
+
+g = io.fopen("blurb", "w")
+if(not g) {
+  print(io.error_message, "(", io.errno, ")")
+}
+else {
+  io.fwrite(g, "Ma", "Porca", "Puttana", "Maiala")
+  io.fwrite(g, "E", "Davvero", "Pero")
+}
+io.fclose(g)

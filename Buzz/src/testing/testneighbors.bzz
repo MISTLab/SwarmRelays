@@ -1,0 +1,45 @@
+function init() {
+  s = swarm.create(1)
+  s.select(id % 2 == 0)
+  o = s.others(2)
+}
+
+function step() {
+  log("ROBOT ", id, ": ", neighbors.count(), " neighbors")
+
+  s.exec(printaccum)
+  o.exec(printaccum)
+
+  log()
+}
+
+function destroy() {
+}
+
+function print_neighbor_accum(rid, data, accum) {
+  accum = accum + 1
+  log("ROBOT ", id, ": NEIGHBOR<id=", rid, ", dist=", data.distance, ", azimuth=", data.azimuth, ", elevation=", data.elevation, ", accum = ", accum, ">")
+  return accum
+}
+
+function printaccum() {
+  var accum
+  log("ROBOT ", id, " is in swarm ", swarm.id())
+  accum = 17
+  accum = neighbors.kin().reduce(print_neighbor_accum, accum)
+  log("ROBOT ", id, ": accum = ", accum)
+}
+
+function printkin() {
+  log("ROBOT ", id, " is in swarm ", swarm.id())
+  neighbors.kin().foreach(function(rid, data) {
+      log("ROBOT ", id, ": NEIGHBOR<id=", rid, ", dist=", data.distance, ", azimuth=", data.azimuth, ", elevation=", data.elevation, ">")
+    })
+}
+
+function printnonkin() {
+  log("ROBOT ", id, " is in swarm ", swarm.id())
+  neighbors.nonkin().foreach(function(rid, data) {
+      log("ROBOT ", id, ": NEIGHBOR<id=", rid, ", dist=", data.distance, ", azimuth=", data.azimuth, ", elevation=", data.elevation, ">")
+    })
+}

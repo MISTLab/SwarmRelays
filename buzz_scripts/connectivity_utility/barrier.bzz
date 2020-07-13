@@ -1,0 +1,39 @@
+########################################
+# BARRIER
+#
+########################################
+
+#
+# Constants
+#
+BARRIER_VSTIG_ID = 77
+
+#
+# Sets a barrier
+#
+function barrier_set(threshold, transf, what) {
+  statef = function() {
+    barrier_wait(threshold, transf);
+  }
+  barrier = stigmergy.create(BARRIER_VSTIG)
+  STATE = str.concat("BARRIER -",what)
+}
+
+#
+# Make yourself ready
+#
+function barrier_ready() {
+  barrier.put(id, 1)
+}
+
+#
+# Executes the barrier
+#
+function barrier_wait(threshold, transf) {
+  barrier.get(id)
+  extradbg = barrier.size()
+  if(barrier.size() >= threshold) {
+    barrier = nil
+    transf()
+  }
+}

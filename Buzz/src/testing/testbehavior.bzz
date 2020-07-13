@@ -1,0 +1,11 @@
+function init() {
+  log("robot ", id, ": init")
+}
+
+function step() {
+  log("robot ", id, ": step")
+}
+
+function destroy() {
+  log("robot ", id, ": destroy")
+}

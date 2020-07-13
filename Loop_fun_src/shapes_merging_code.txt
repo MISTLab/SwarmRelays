@@ -1,0 +1,321 @@
+  if (m_map_file.is_open())
+  {
+    int line_num = 0;
+    while ( getline (m_map_file,line) )
+    { 
+      if(line_num < 4){ // header
+        if(line_num == 1){
+           std::string str_height = line.substr (7,line.size());
+           map_height = std::stoi(str_height) ;
+           // std::cout << "height "<< map_height << '\n';
+        }
+        if(line_num == 2){
+           std::string str_length = line.substr (6,line.size());
+           map_length = std::stoi(str_length) ;
+           // std::cout << "length "<< map_length << '\n';
+        }
+        if(line_num == 3){
+          half_map_height = (double)((double)map_height/2) * -1;
+          half_map_length = (double)((double)map_length/2) * -1;
+          // MIN_X = half_map_height;
+          // MIN_Y = half_map_length;
+          // MAX_X = half_map_height*-1;
+          // MAX_Y = half_map_length*-1;
+          
+          // std::cout << "half length "<< half_map_length << '\n';
+          // std::cout << "half height "<< half_map_height << '\n';
+        }
+      }
+      else{
+        std::vector<int> v_row;
+        for(int i=0;i<line.size();i++){
+          if(line[i] == free_space || line[i] == free_space_l || line[i] == START_space ||
+             line[i] == TARGET_space)
+            v_row.push_back(0);
+          else
+            v_row.push_back(1);
+          if(line[i] == START_space){
+            // start_pos[0]=(line_num-3)+half_map_height;
+            // start_pos[1]=i+half_map_length;
+          }
+          else if(line[i] == TARGET_space){
+            // end_pos[0]=(line_num-3)+half_map_height;
+            // end_pos[1]=i+half_map_length;
+          }
+        // printf("%s\n",line.c_str());
+      // std::cout << line << '\n';
+        // for(int i=0;i<line.size();i++){
+        //   if(line[i] == free_space || line[i] == free_space_l);
+        //   else if(line[i] == Tree_space){
+        //     // Add a rectagle for trees
+        //     obstacles.push_back(Rectangle_t(line_num + half_map_height,  i+half_map_length, 1.0f, 1.0f, true));
+        //   }
+        //   else if(line[i] == outofbound_space || line[i] == outofbound_space_l){
+        //     // Add a box for out of space entity
+        //     obstacles.push_back(Rectangle_t(line_num + half_map_height,  i+half_map_length, 1.0f, 1.0f, true));
+        //   }
+        //   else if(line[i] == START_space){
+        //     // Store the start point
+        //     // Start_state = CVector2(line_num + half_map_height, i+half_map_length);
+        //     // std::cout << "Start state  "<< Start_state.GetX()<<" , "<< Start_state.GetY() << '\n';
+        //   }
+        //   else if(line[i] == TARGET_space){
+        //     // Store Goal state
+        //     // Goal_state = CVector2(line_num + half_map_height, i+half_map_length);
+        //     // std::cout << "Goal state  "<< Goal_state.GetX()<<" , "<< Goal_state.GetY() << '\n';
+
+        //   }
+        // }
+      }
+      v_map.push_back(v_row);
+      }
+      line_num +=1;
+    }
+    m_map_file.close();
+    std::vector<int> v_emp(v_map[0].size(),0);
+    std::vector<std::vector<int>> boundary_map(v_map.size(),v_emp);
+    std::vector<Rectangle_t> y_shapes;
+    std::vector<Rectangle_t> x_shapes;
+
+    for(int i=0;i<v_map.size();++i){
+      for(int j=0;j<v_map[i].size();++j){
+        if(i==0){ // top case
+          if(v_map[i][j] == 1 && (v_map[i][j-1] == 0 || v_map[i][j+1] == 0 || v_map[i+1][j] == 0 ||
+             v_map[i+1][j+1] == 0 || v_map[i+1][j-1] == 0) ){
+              // Add a column for trees
+              boundary_map[i][j] = 1;
+            //   AddEntity(
+            // *new CBoxEntity("box"+std::to_string(i)+"_"+std::to_string(j),
+            //                 CVector3((i) + half_map_height, j+half_map_length, 0),
+            //                 CQuaternion(),
+            //                 false,
+            //                 CVector3(OBSTACLE_SIDES1, OBSTACLE_SIDES2, WALL_HEIGHT)));
+              // obstacles.push_back(Rectangle_t(i + half_map_height,  j+half_map_length, OBSTACLE_SIDES1, OBSTACLE_SIDES2, true));
+          }
+        }
+        else if(i == v_map.size()-1){ // bottom case 
+          if(v_map[i][j] == 1 && (v_map[i][j-1] == 0 || v_map[i][j+1] == 0 || v_map[i-1][j] == 0 ||
+             v_map[i-1][j-1] == 0 || v_map[i-1][j+1] == 0) ){
+              // Add a column for trees
+              boundary_map[i][j] = 1;
+            // AddEntity(
+            // *new CBoxEntity("box"+std::to_string(i)+"_"+std::to_string(j),
+            //                 CVector3((i) + half_map_height, j+half_map_length, 0),
+            //                 CQuaternion(),
+            //                 false,
+            //                 CVector3(OBSTACLE_SIDES1, OBSTACLE_SIDES2, WALL_HEIGHT)));
+              // obstacles.push_back(Rectangle_t(i + half_map_height,  j+half_map_length, OBSTACLE_SIDES1, OBSTACLE_SIDES2, true));
+          }
+        }
+        else if(j == 0){ // Left case
+          if(v_map[i][j] == 1 && (v_map[i][j+1] == 0 || v_map[i-1][j] == 0 || v_map[i+1][j] == 0 ||
+             v_map[i-1][j+1] == 0 || v_map[i+1][j+1] == 0) ){
+              // Add a column for trees
+              boundary_map[i][j] = 1;
+            // AddEntity(
+            // *new CBoxEntity("box"+std::to_string(i)+"_"+std::to_string(j),
+            //                 CVector3((i) + half_map_height, j+half_map_length, 0),
+            //                 CQuaternion(),
+            //                 false,
+            //                 CVector3(OBSTACLE_SIDES1, OBSTACLE_SIDES2, WALL_HEIGHT)));
+              // obstacles.push_back(Rectangle_t(i + half_map_height,  j+half_map_length, OBSTACLE_SIDES1, OBSTACLE_SIDES2, true));
+              
+          }
+        }
+        else if(j == v_map[i].size()-1){ // right case
+          if(v_map[i][j] == 1 && (v_map[i][j-1] == 0 || v_map[i-1][j] == 0 || v_map[i+1][j] == 0 ||
+             v_map[i-1][j-1] == 0 || v_map[i+1][j-1] == 0) ){
+              // Add a column for trees
+              boundary_map[i][j] = 1;
+            // AddEntity(
+            // *new CBoxEntity("box"+std::to_string(i)+"_"+std::to_string(j),
+            //                 CVector3((i) + half_map_height, j+half_map_length, 0),
+            //                 CQuaternion(),
+            //                 false,
+            //                 CVector3(OBSTACLE_SIDES1, OBSTACLE_SIDES2, WALL_HEIGHT)));
+              // obstacles.push_back(Rectangle_t(i + half_map_height,  j+half_map_length, OBSTACLE_SIDES1, OBSTACLE_SIDES2, true));
+          }
+        }
+        else{
+          if(v_map[i][j] == 1 && (v_map[i][j-1] == 0 || v_map[i][j+1] == 0 || v_map[i-1][j] == 0 || v_map[i+1][j] == 0 ||
+            v_map[i-1][j-1] == 0 || v_map[i-1][j+1] == 0 || v_map[i+1][j+1] == 0 || v_map[i+1][j-1] == 0) ){
+              // Add a column for trees
+              boundary_map[i][j] = 1;
+            // AddEntity(
+            //     *new CBoxEntity("box"+std::to_string(i)+"_"+std::to_string(j),
+            //                     CVector3((i) + half_map_height, j+half_map_length, 0),
+            //                     CQuaternion(),
+            //                     false
+            //                     CVector3(OBSTACLE_SIDES1, OBSTACLE_SIDES2, WALL_HEIGHT)));
+                    // obstacles.push_back(Rectangle_t(i + half_map_height,  j+half_map_length, OBSTACLE_SIDES1, OBSTACLE_SIDES2, true));
+          } 
+        }
+      }
+    }
+
+    // continuity checking loop 
+    // y shapes pick up loop
+    for(int i=0;i< 4;++i){// boundary_map.size();++i){
+      int y_old = 0;
+      int y_start = 0;
+      int y_continuing =0;
+      for(int j=0;j<boundary_map[i].size();++j){
+        std::cout<<boundary_map[i][j];
+        if(boundary_map[i][j] == 1 && y_continuing == 1){
+          y_old = j;
+        }
+        else if(boundary_map[i][j] == 1 && y_continuing == 0){
+          y_start = j;
+          y_old = j;
+          y_continuing=1;
+        }
+        else if( (boundary_map[i][j] == 0 && y_continuing == 1) ){
+          // end of this shape
+          Rectangle_t c_shape(i-(OBSTACLE_SIDES1/2),y_old+(OBSTACLE_SIDES2/2),i+(OBSTACLE_SIDES1/2),y_start-(OBSTACLE_SIDES2/2));
+          y_shapes.push_back(c_shape);
+          y_continuing = 0;
+          // std::cout<<" Adding ";
+        }
+        if((y_continuing==1 && j==boundary_map[i].size()-1) ){
+          //last block have to add the current formed shape
+          Rectangle_t c_shape(i-(OBSTACLE_SIDES1/2),y_old+(OBSTACLE_SIDES2/2),i+(OBSTACLE_SIDES1/2),y_start-(OBSTACLE_SIDES2/2));
+          y_shapes.push_back(c_shape);
+          y_continuing = 0;
+          // std::cout<<" Adding ";
+        }
+        // std::cout<<" y_cont "<<y_continuing<< " y_start "<<y_start<<" y_old "<< y_old<<std::endl;
+      }
+      std::cout<<std::endl;
+    }
+    std::cout<<" s x "<<half_map_height<<" s y "<<half_map_length<<std::endl;
+    // std::cout<<"  ------------------------------------- X values ---------------"<<std::endl;
+
+    // x shapes pickup loop
+    for(int j=0;j< 3;++j){ //boundary_map[0].size();++j){
+      int x_old = 0;
+      int x_start = 0;
+      int x_continuing =0;
+      for(int i=0;i<boundary_map.size();++i){
+        std::cout<<boundary_map[i][j];
+        if(boundary_map[i][j] == 1 && x_continuing == 1){
+          x_old = i;
+        }
+        else if(boundary_map[i][j] == 1 && x_continuing == 0){
+          x_start = i;
+          x_old = i;
+          x_continuing=1;
+        }
+        else if(boundary_map[i][j] == 0 && x_continuing == 1){
+          // end of this shape
+          Rectangle_t c_shape(x_old+(OBSTACLE_SIDES1/2),j-(OBSTACLE_SIDES2/2),x_start-(OBSTACLE_SIDES1/2),j+(OBSTACLE_SIDES2/2));
+          x_shapes.push_back(c_shape);
+          x_continuing = 0;
+        }
+
+        if((x_continuing==1 && i==boundary_map.size()-1) ){
+          //last block have to add the current formed shape
+          Rectangle_t c_shape(x_old+(OBSTACLE_SIDES1/2),j-(OBSTACLE_SIDES2/2),x_start-(OBSTACLE_SIDES1/2),j+(OBSTACLE_SIDES2/2));
+          x_shapes.push_back(c_shape);
+          x_continuing = 0;
+          // std::cout<<" Adding ";
+        }
+
+      }
+      std::cout<<std::endl;
+
+    }
+    std::cout<<" X shape size before delete: "<<x_shapes.size()<<" Y shape before delete: "<<y_shapes.size()<<std::endl;
+
+    auto yit = y_shapes.begin();
+    int y_cnt=0;
+    while (yit != y_shapes.end()){
+      int y_erased = 0;
+      int x_cnt=0;
+      auto xit = x_shapes.begin();
+      while (xit != x_shapes.end())
+      {
+        
+        int x_erased = 0;
+        std::cout<<x_cnt<<", "<<y_cnt<<","<<" Shapes coinciding "<<xit->find_coincide(*yit)<<std::endl;
+        std::cout<<"y's X "<<((y_shapes[y_cnt]).high_x -(((y_shapes[y_cnt]).high_x-(y_shapes[y_cnt]).low_x)/2))
+                 <<" y's Y "<< ((y_shapes[y_cnt]).high_x -(((y_shapes[y_cnt]).high_x-(y_shapes[y_cnt]).low_x)/2))
+                 <<" x's lX "<<(x_shapes[x_cnt]).low_x
+                 <<" x's hx "<<(x_shapes[x_cnt]).high_x
+                 <<" x's ly "<<(x_shapes[x_cnt]).low_y
+                 <<" x's hy"<<(x_shapes[x_cnt]).high_y
+                 <<std::endl;
+
+        // detect for coinciding shapes
+
+        if( (((y_shapes[y_cnt]).high_x -(((y_shapes[y_cnt]).high_x-(y_shapes[y_cnt]).low_x)/2)) > (x_shapes[x_cnt]).low_x && 
+               ((y_shapes[y_cnt]).high_x -(((y_shapes[y_cnt]).high_x-(y_shapes[y_cnt]).low_x)/2)) < (x_shapes[x_cnt]).high_x && 
+               ((y_shapes[y_cnt]).high_y -(((y_shapes[y_cnt]).high_y-(y_shapes[y_cnt]).low_y)/2)) > (x_shapes[x_cnt]).low_y && 
+               ((y_shapes[y_cnt]).high_y -(((y_shapes[y_cnt]).high_y-(y_shapes[y_cnt]).low_y)/2)) < (x_shapes[x_cnt]).high_y   )||
+            (((*yit).high_x -(((*yit).high_x-(*yit).low_x)/2)) > (*xit).low_x && 
+               ((*yit).high_x -(((*yit).high_x-(*yit).low_x)/2)) < (*xit).high_x && 
+               ((*yit).high_y -(((*yit).high_y-(*yit).low_y)/2)) > (*xit).low_y && 
+               ((*yit).high_y -(((*yit).high_y-(*yit).low_y)/2)) < (*xit).high_y   )) {
+          std::cout<<" Shapes coinciding"<<"area1 "<<yit->get_area()<<" area2"<<xit->get_area()<< std::endl;
+        
+          if(xit->get_area() > yit->get_area()){
+            std::cout<<"Erasing y"<<std::endl;
+            yit = y_shapes.erase(yit);
+            y_erased = 1;
+          }
+          else{
+            // use returned iterator
+            xit = x_shapes.erase(xit);
+            x_erased = 1;
+            std::cout<<"Erasing x"<<std::endl;
+          }
+          
+        }
+        // Increment if not erased
+        if(x_erased==0) {
+          ++xit;
+          x_cnt+=1;
+        }
+      }
+      
+      if(y_erased == 1);
+      else{
+       ++yit; // Increment if not erased
+       y_cnt+=1;
+      }
+    }
+    // std::cout<<" Xcnt "<<x_cnt<<" Y_cnt"<<y_cnt<<std::endl;
+    std::cout<<" After X shape size: "<<x_shapes.size()<<" After Y shape: "<<y_shapes.size()<<std::endl;
+
+    //add the shapes
+    for(int i=0;i<x_shapes.size();++i){
+      std::vector<double> pos_center = x_shapes[i].get_pos_dim();
+      std::cout<< "Pos X "<<pos_center[0]<<" Pos y "<<pos_center[1]<<" dimx "<<pos_center[2]<<" dimy "<<pos_center[3]<<std::endl;
+      std::vector<double> pos = x_shapes[i].get_hl();
+      std::cout<< "h X "<<pos[0]<<" h y "<<pos[1]<<" lx "<<pos[2]<<" ly "<<pos[3]<<std::endl;
+
+      AddEntity(
+            *new CBoxEntity("boxx"+std::to_string(i),
+                            CVector3(pos_center[0] + half_map_height, pos_center[1]+half_map_length, 0),
+                            CQuaternion(),
+                            false,
+                            CVector3(pos_center[2], pos_center[3], WALL_HEIGHT)));
+    }
+
+    std::cout<<"---------------------------------Yshapes ----------------------------------------------"<<std::endl;
+     //add the shapes
+    for(int i=0;i<y_shapes.size();++i){
+      std::vector<double> pos_center = y_shapes[i].get_pos_dim();
+      std::cout<< "Pos X "<<pos_center[0]<<" Pos y "<<pos_center[1]<<" dimx "<<pos_center[2]<<" dimy "<<pos_center[3]<<std::endl;
+      std::vector<double> pos = y_shapes[i].get_hl();
+      std::cout<< "h X "<<pos[0]<<" h y "<<pos[1]<<" lx "<<pos[2]<<" ly "<<pos[3]<<std::endl;
+
+      AddEntity(
+            *new CBoxEntity("boxy"+std::to_string(i),
+                            CVector3(pos_center[0] + half_map_height, pos_center[1]+half_map_length, 0),
+                            CQuaternion(),
+                            false,
+                            CVector3(pos_center[2], pos_center[3], WALL_HEIGHT)));
+    }
+
+  }
+  else {printf("ERROR in Opening Map file\n");}

@@ -1,0 +1,33 @@
+t = {.x = 1, .y = 2, .z = 3, .7 = 6, .3.5 = 9}
+# t.x = 1
+# t.y = 2
+# t.z = 3
+
+print("size = ", size(t))
+foreach(t, function(k, v) {
+    print(" ", k, " -> ", v)
+  })
+
+t.y = nil
+
+print("size = ", size(t))
+foreach(t, function(k, v) {
+    print(" ", k, " -> ", v)
+  })
+
+function f(tbl) {
+  print("tbl size = ", size(tbl))
+  foreach(tbl, function(k, v) {
+      print(" ", k, " -> ", v)
+    })
+}
+
+f({.a = 1, .b = 2, .1 = "a", .2.5 = "b.5"})
+
+f(map({.a = 1, .b = 2},
+    function(k,v) {
+      return v + 100
+    }))
+
+t = {.a = 1., .b = 4., .c = 8.}
+print(reduce(t, function(k,v,a) { return v+a }, 0) / size(t))

@@ -1,0 +1,59 @@
+#
+# Declare variables
+#
+var robots
+var s
+var t
+
+#
+# Executed at init time
+#
+function init() {
+  robots = 3
+  s = stigmergy.create(1)
+  s.onconflict(function(k, l, r){
+      log("fb ", id, ": conflict on vstig[", k, "]: r", l.robot, " / r", r.robot)
+      if(l.robot > r.robot) { return l }
+      else                  { return r }
+    })
+  s.onconflictlost(function(k, l){
+      log("fb ", id, ": lost conflict on vstig[", k, "]")
+    })
+  t = 0
+  return
+}
+
+#
+# Executed at each time step
+#
+function step() {
+  # Increase step count
+  t = t + 1
+  if(t < 10) {
+    # Put step count
+    s.put(id, t)
+    # Use foreach
+    s.foreach(function(key,value,robot) {
+      log("F fb ", id, ": vstig[", key, "] = ", value, ", robot = ", robot)
+    })
+    # Print other known values in stigmergy
+    i = 0
+    while(i < robots) {
+      log("W fb ", id, ": vstig[", i, "] = ", s.get(i))
+      i = i + 1
+    }
+    log()
+  }
+  else {
+    if(t == 100) {
+      # Print other known values in stigmergy
+      i = 0
+      while(i < robots) {
+        log("W fb ", id, ": vstig[", i, "] = ", s.get(i))
+        i = i + 1
+      }
+      log()
+    }
+  }
+  return
+}
