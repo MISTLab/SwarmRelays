@@ -138,7 +138,6 @@ ELECTION_VS = nil
 
 function init(){
 
-
   if(CF){ 
    MOVEMENT_TOLERENCE = 0.35
   }
@@ -285,11 +284,10 @@ function backbone(){
 	    path_sigmergy.put(-1,PATH_TYPE)
       path_sigmergy.put(-2,path_sigmergy.size())
       PLANNED_TRUE = 1
-      # log("[",id,"] WORKER  Path type ",PATH_TYPE)
     if(PATH_TYPE > 1){
       
       var num_of_3d_robots = determine_no_of_robots_req_in_chain(path_sigmergy.get(-1)+1,path_sigmergy.size()-2)
-      # log("[",id,"] num 3d robots ",num_of_3d_robots," V_TYPE ", V_TYPE)
+
     
       if(num_of_3d_robots >= 1 and V_TYPE == 0){
         # log("I am a 2d robot can't reach 3d points elect a 3d robot to be a worker")
