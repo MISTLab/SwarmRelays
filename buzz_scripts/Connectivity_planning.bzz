@@ -271,7 +271,7 @@ function backbone(){
     set_leds(255,0,0)
     # Worker plan the path 
 	if(PLANNED_TRUE == 0){
-    log(id,"]-> Initializing planner ")
+    # log(id,"]-> Initializing planner ")
     PLAN_HOLD = 20
     path_sigmergy = stigmergy.create(TARGET)
     # loads the ground truth map from the file specified in the .argos file 

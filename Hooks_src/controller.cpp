@@ -14,8 +14,8 @@ static const char Water_space = 'W';
 static const char START_space = 'A';
 static const char TARGET_space = 'X';
 static const float ROBOT_BUFFER = 0.01; // Consider robot radius
-static float OBSTACLE_SIDES1 = 1.0f;
-static float OBSTACLE_SIDES2 = 1.0f;
+static float OBSTACLE_SIDES1 = 0.7f;
+static float OBSTACLE_SIDES2 = 0.7f;
 
 
 /****************************************/
@@ -562,9 +562,9 @@ void CConnectivityBuzzControllerKheperaIV::SetLEDs(const CColor& c_color) {
 
 
 std::vector<std::vector<double>> CConnectivityBuzzControllerKheperaIV::OneShotPathPlanner(float* start_end_time){
-  for(int i =0; i< 5; i++){
-    fprintf(stderr, "pos args received in recur planner %i -> %f \n",i,start_end_time[i]);
-  }
+  // for(int i =0; i< 5; i++){
+  //   fprintf(stderr, "pos args received in recur planner %i -> %f \n",i,start_end_time[i]);
+  // }
   // /* If solved obtain the best solutions found */
   std::vector<std::vector<double>> solution_nodes;
   /* Initialize a 2d vector state space within the planner */
@@ -588,7 +588,7 @@ std::vector<std::vector<double>> CConnectivityBuzzControllerKheperaIV::OneShotPa
     /* Set the object used to check which states in the space are valid */
     si->setStateValidityChecker(ob::StateValidityCheckerPtr(new ValidityChecker(si,&Grid_map[0], &m_restrictz, map_resolution)));
     si->setup();
-    printf("Half height %f length %f\n",half_map_height, half_map_length );
+    // printf("Half height %f length %f\n",half_map_height, half_map_length );
     // Set our robot's starting state to be the one obtained by import map
     ob::ScopedState<> start(oneshot_space);
     start->as<ob::RealVectorStateSpace::StateType>()->values[0] = start_end_time[0]+(half_map_height/2);//start_end_pos[0][0];
@@ -617,7 +617,7 @@ std::vector<std::vector<double>> CConnectivityBuzzControllerKheperaIV::OneShotPa
     oneshot_optimizingPlanner->setup();
     // attempt to solve the planning problem within time in second given by the user from bzz.
     ob::PlannerStatus solved = oneshot_optimizingPlanner->solve(start_end_time[4]);
-    printf("solving\n");
+
     // Keep solving, if you did not reach the target yet. 
     // while(oneshot_pdef->hasApproximateSolution()) solved = oneshot_optimizingPlanner->solve(0.1);
     
@@ -636,15 +636,15 @@ std::vector<std::vector<double>> CConnectivityBuzzControllerKheperaIV::OneShotPa
       std::shared_ptr<ompl::geometric::PathGeometric> c_path = 
             std::dynamic_pointer_cast<ompl::geometric::PathGeometric>(oneshot_pdef->getSolutionPath());
       
-      fprintf(stderr, "Current state count in path: %i , length: %f, Num of states req %f\n", 
-                        (int)(c_path->getStateCount()), c_path->length(), c_path->length()/Required_path_segment_len);
+      // fprintf(stderr, "Current state count in path: %i , length: %f, Num of states req %f\n", 
+      //                   (int)(c_path->getStateCount()), c_path->length(), c_path->length()/Required_path_segment_len);
       c_path->interpolate((unsigned int) c_path->length()/Required_path_segment_len);
       // fprintf(stderr, "After intepolation: %i \n", (int)(c_path->getStateCount())); 
       std::vector<ob::State *> solutionStates = c_path->getStates();                  
       for(auto state : solutionStates){
         std::vector<double> statePoint(3,0.0);
-        // std::cout<<" SOl state  X "<< state->as<ob::RealVectorStateSpace::StateType>()->values[0]
-        //   <<" Y "<<state->as<ob::RealVectorStateSpace::StateType>()->values[1]<<std::endl;
+        // std::cout<<" SOl state  X "<< (state->as<ob::RealVectorStateSpace::StateType>()->values[0])-(half_map_height/2)
+        //   <<" Y "<<(state->as<ob::RealVectorStateSpace::StateType>()->values[1])-(half_map_length/2)<<std::endl;
           statePoint[0]= state->as<ob::RealVectorStateSpace::StateType>()->values[0]-(half_map_height/2);
           statePoint[1]= state->as<ob::RealVectorStateSpace::StateType>()->values[1]-(half_map_length/2);
           solution_nodes.push_back(statePoint);
@@ -862,7 +862,6 @@ std::vector<std::vector<double>> CConnectivityBuzzControllerKheperaIV::import_ma
     Grid_map_visited.push_back(Grid_GT);
     Grid_map.push_back(Grid_GT);
     Grid_map_GT.push_back(Grid_GT);
-    printf("Size of grid x %u size of grid y %u\n",Grid_map2d.size(),Grid_map2d[0].size());
     // half_map_length = half_map_length *-1;
     // half_map_height = half_map_height *-1;
 

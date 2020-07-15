@@ -52,11 +52,6 @@
                   label="Planning"
                   map_file_name="maps/Comparisions/comp_structure.map" 
                   map_option="0"
-                  robots = "0"
-                  flying_robots = "0"
-                  data_size = "500"
-                  rab_range ="12"
-                  Number_of_links="1"
                  />
 
   <!-- *********************** -->

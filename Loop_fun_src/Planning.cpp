@@ -68,13 +68,13 @@ void Planningloop::Init(TConfigurationNode& t_tree) {
    try {
       /* Parse the configuration file */
       // GetNodeAttribute(t_tree, "outfile", m_strOutFile);
-      GetNodeAttribute(t_tree, "robots", unRobots);
-      UInt32 flying_robot_number;
-      GetNodeAttribute(t_tree, "flying_robots", flying_robot_number);
-      UInt32 unDataSize;
-      GetNodeAttribute(t_tree, "data_size", unDataSize);
-      Real rab_range;
-      GetNodeAttribute(t_tree, "rab_range", rab_range);
+      // GetNodeAttribute(t_tree, "robots", unRobots);
+      // UInt32 flying_robot_number;
+      // GetNodeAttribute(t_tree, "flying_robots", flying_robot_number);
+      // UInt32 unDataSize;
+      // GetNodeAttribute(t_tree, "data_size", unDataSize);
+      // Real rab_range;
+      // GetNodeAttribute(t_tree, "rab_range", rab_range);
       // std::string OUT_FNAME; 
       // GetNodeAttribute(t_tree, "out_file", OUT_FNAME);
       // POSTITIONFILE_PREFIX +=OUT_FNAME+".dat";
@@ -85,10 +85,10 @@ void Planningloop::Init(TConfigurationNode& t_tree) {
       // GetNodeAttribute(t_tree, "fault_percent", m_fault_percent);
       // GetNodeAttribute(t_tree, "faulty_number", faulty_number);
 
-      GetNodeAttribute(t_tree, "Number_of_links", number_of_links);
-      int number_of_faulty_robots = unRobots * m_fault_percent;
-      printf("Number of robots %u Fault percent %f links %i num of faulty robots %i\n",unRobots,m_fault_percent,number_of_links,
-         number_of_faulty_robots);
+      // GetNodeAttribute(t_tree, "Number_of_links", number_of_links);
+      // int number_of_faulty_robots = unRobots * m_fault_percent;
+      // printf("Number of robots %u Fault percent %f links %i num of faulty robots %i\n",unRobots,m_fault_percent,number_of_links,
+      //    number_of_faulty_robots);
 
       GetNodeAttribute(t_tree, "map_file_name", m_map_file_name);
       int map_option = 0;
@@ -102,23 +102,23 @@ void Planningloop::Init(TConfigurationNode& t_tree) {
       }
 
       // Place the robots arounds the start point randomly
-      CRange<Real> c_range_x(CRANGE_START_POS.GetMin() + Start_state.GetX(), 
-                             CRANGE_START_POS.GetMax() + Start_state.GetX());
-      CRange<Real> c_range_y(CRANGE_START_POS.GetMin() + Start_state.GetY(), 
-                             CRANGE_START_POS.GetMax() + Start_state.GetY());
+      // CRange<Real> c_range_x(CRANGE_START_POS.GetMin() + Start_state.GetX(), 
+      //                        CRANGE_START_POS.GetMax() + Start_state.GetX());
+      // CRange<Real> c_range_y(CRANGE_START_POS.GetMin() + Start_state.GetY(), 
+      //                        CRANGE_START_POS.GetMax() + Start_state.GetY());
 
-      CRange<Real> c_spiri_range_x(CRANGE_SPIRI_START_POS.GetMin() + Start_state.GetX(), 
-                             CRANGE_SPIRI_START_POS.GetMax() + Start_state.GetX());
-      CRange<Real> c_spiri_range_y(CRANGE_SPIRI_START_POS.GetMin() + Start_state.GetY(), 
-                             CRANGE_SPIRI_START_POS.GetMax() + Start_state.GetY());
-      PlaceUniformly(unRobots,
-                     flying_robot_number,
-                     unDataSize,
-                     rab_range,
-                     c_range_x,
-                     c_range_y,
-                     c_spiri_range_x,
-                     c_spiri_range_y);
+      // CRange<Real> c_spiri_range_x(CRANGE_SPIRI_START_POS.GetMin() + Start_state.GetX(), 
+      //                        CRANGE_SPIRI_START_POS.GetMax() + Start_state.GetX());
+      // CRange<Real> c_spiri_range_y(CRANGE_SPIRI_START_POS.GetMin() + Start_state.GetY(), 
+      //                        CRANGE_SPIRI_START_POS.GetMax() + Start_state.GetY());
+      // PlaceUniformly(unRobots,
+      //                flying_robot_number,
+      //                unDataSize,
+      //                rab_range,
+      //                c_range_x,
+      //                c_range_y,
+      //                c_spiri_range_x,
+      //                c_spiri_range_y);
  
       /* Initialize the rest */
       Reset();
@@ -515,7 +515,7 @@ void Planningloop::LoadMapIntoArena(std::string m_map_file_name){
               //                        WALL_HEIGHT*4));
               // Store the start point
               Start_state = CVector2((line_num-4) + half_map_height, i+half_map_length);
-              std::cout << "Start state  "<< Start_state.GetX()<<" , "<< Start_state.GetY() << '\n';
+              // std::cout << "Start state  "<< Start_state.GetX()<<" , "<< Start_state.GetY() << '\n';
             }
             else if(line[i] == TARGET_space){
               // Add a long thin column for end for debugging
@@ -528,7 +528,7 @@ void Planningloop::LoadMapIntoArena(std::string m_map_file_name){
               //                        WALL_HEIGHT*1.5));
               // Store Goal state
               Goal_state = CVector2((line_num-4) + half_map_height, i+half_map_length);
-              std::cout << "Goal state  "<< Goal_state.GetX()<<" , "<< Goal_state.GetY() << '\n';
+              // std::cout << "Goal state  "<< Goal_state.GetX()<<" , "<< Goal_state.GetY() << '\n';
 
             }
           } 
