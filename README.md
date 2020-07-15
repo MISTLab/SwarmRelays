@@ -1,7 +1,5 @@
 # SwarmRelays
 This is the official code repository for project Swarm Relays.
-## SwarmRelays
-This is the official code repository for project Swarm Relays.
 (This is only a restricted set of the code, we will keep updating the complete code). 
 If you use the code from this project please cite: 
 
@@ -17,13 +15,13 @@ If you use the code from this project please cite:
 
 ```
 The following instructions assume the user is running a Debian OS (e.g. Ubuntu)
-# Dependencies 
+## Dependencies 
 The Open Motion Planning Library (OMPL)
 OMPL has the following required dependencies:
 Boost (version 1.58 or higher)
 CMake (version 3.5 or higher)
 Eigen (version 3.3 or higher)
-# Installing OMPL
+## Installing OMPL
 ```
 $ git clone https://github.com/ompl/ompl.git
 $ mkdir -p build/Release
@@ -46,7 +44,7 @@ sudo apt-get install cmake libfreeimage-dev libfreeimageplus-dev \
   qt5-default freeglut3-dev libxi-dev libxmu-dev liblua5.3-dev \
   lua5.3 doxygen graphviz graphviz-dev asciidoc
 ```
-# Installing ARGoS3
+## Installing ARGoS3
 ```
 $ git clone https://github.com/ilpincy/argos3.git argos3
 $ cd argos3
@@ -107,7 +105,7 @@ $ cd ..
 $ cd buzz_scripts
 $ bzzc Connectivity_planning.bzz
 ```
-# Launching the experiment 
+## Launching the experiment 
 ```
 $ cd ..
 # you should now be in the repository folder.
@@ -115,7 +113,10 @@ $ argos3 -c Swarm_relay_demo.argos
 ```
 The experiment at time step 103 generates an SVG file in the root repository folder, from which the path generated for building the communication chain can be visualized. The SVG file writer was adapted from https://github.com/olegsinyavskiy/sparse_rrt
 
-# Changing the map file 
-There are several map files included in this repository obtained from https://www.movingai.com/benchmarks/ 
+## Changing the map file 
+There are several map files included in this repository from https://www.movingai.com/benchmarks/ 
+one could change the map files in the .argos file to simulate a different map. Please be sure to change the map file at two locations: 1. Inside the controller definition by changing the "map_file" variable to the right map, 2. Inside the loop function by changing "map_file_name" variable. The file path defined inside the controller is used by the path planner to compute a path and the file path define inside the loop function is used to create the simulation arena.
 
-TODO
+## Changing the targets
+One can change the targets inside the simulation arena by changing the targets in the file "connectivity_utility/targets123.bzz" and changing it to load the right function at line 151. The default function loads "Read_Target2" and this specifies two targets at distance 10.5 m.
+ 
