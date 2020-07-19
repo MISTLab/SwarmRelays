@@ -5,19 +5,12 @@ If you use the code from this project please cite:
 
 ```
 @ARTICLE{Varadharajan2020,
-
   author={V. S. {Varadharajan} and D. {St-Onge} and B. {Adams} and G. {Beltrame}},
-
   journal={IEEE Robotics and Automation Letters}, 
-
   title={Swarm Relays: Distributed Self-Healing Ground-and-Air Connectivity Chains}, 
-
   year={2020},
-
   volume={5},
-
   number={4},
-
   pages={5347-5354},}
 
 
